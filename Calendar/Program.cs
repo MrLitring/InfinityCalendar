@@ -21,8 +21,10 @@ namespace Calendare
             Config.Settings.Initilization();
             Calendare.LibClasses.DataBase.SqlController.OpenOrCreateConnection();
 
+            Modules.Main.Controller mainFormShower = new Modules.Main.Controller(new Modules.Main.MainForm());
+
             Modules.Controller controller = new Controller(new object[] {
-               new Modules.Main.MainForm(),
+               mainFormShower.form,
                new Modules.Calendar.CalendarForm(),
                new Modules.Event.EventForm(),
                new Modules.Event.EventModel(),

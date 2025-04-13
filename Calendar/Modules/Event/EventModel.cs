@@ -8,69 +8,74 @@ using Calendare.LibClasses.DataBase;
 using Calendare.LibClasses.CustomDateTime;
 using System.Windows.Forms;
 using Calendare.LibClasses;
-using Calendare.LibClasses.DataBase;
 using System.Data.SQLite;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 
 namespace Calendare.Modules.Event
 {
     public class EventModel
     {
+        public CellPoint cellPoint;
         public CustomDateTime dateTime { get; set; }
 
+        public List<EventItem> events { get; private set; }
+        public List<EventItem> dayEvents { get; private set; }
 
         public EventModel()
         {
-            
-
-
+            events = new List<EventItem>();
+            dayEvents = new List<EventItem>();
         }
 
-        public void Main()
+        public void DataChange(CustomDateTime time)
         {
-            int count = 0;
-            string where = "";
-            where = $"where Day = {dateTime.Day} AND Month = {dateTime.Month} AND YEAR = {dateTime.Year}";
-            List<EventItem> s = SQLEventItem.EventItemList(where);
-            MessageBox.Show(s.Count().ToString());
+            dateTime = time;
+            events = SQLEventItem.EventItemList($"month = {time.Month} and year = {time.Year}");
+            dayEvents = SQLEventItem.EventItemList($"day = {time.Day} and month = {time.Month} and year = {time.Year}");
+        }
+        public DataTable GetEventTable(DataTable dataTable)
+        {
+            List<EventItem> listEvents = SQLEventItem.EventItemList($"month = {dateTime.Month} and year = {dateTime.Year}");
+            DataTable eventTable = dataTable.Copy();
+
+            for (int row = 0; row < eventTable.Rows.Count; row++)
+            {
+                for (int col = 0; col < eventTable.Columns.Count; col++)
+                {
+                    if (dataTable.Rows[row][col].ToString() != "" && int.TryParse(dataTable.Rows[row][col].ToString(), out _) == true)
+                        eventTable.Rows[row][col] = isFirstDate(listEvents, (int)dataTable.Rows[row][col]) ? 1 : 0;
+                    else
+                        eventTable.Rows[row][col] = 0;
+                }
+            }
+
+            return eventTable;
         }
 
-
-
-        //public EventModel()
-        //{
-        //    SQLiteCommand command = new SQLiteCommand();
-        //    command.CommandText = "Select MAX(id) from " + Config.Settings.DataBaseEventTableName;
-
-        //    using (SQLiteDataReader reader = SqlController.ReaderExecute(command))
-        //    {
-        //        if (reader.HasRows)
-        //        {
-        //            while (reader.Read())
-        //            {
-        //                int max = reader.IsDBNull(0) ? 0 : reader.GetInt32(0);
-        //                MessageBox.Show(max.ToString());
-        //            }
-        //        }
-        //    }
-        //    //CustomDateTime customDateTime = new CustomDateTime(CustomDateTime.Now(), '.');
-            //EventItem item = new EventItem(3, "name", customDateTime, string.Empty, true);
-            //SQLEventItem eventInsert = new SQLEventItem(item, SQLEventItem.DataOperation.Insert);
-            //eventInsert.Execute();
-        //}
-
-
-        public DataTable GetDataTable(DataTable dataTable)
+        public DataTable GetDayDataTable()
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("id", typeof(object));
-            dt.Columns.Add("name", typeof(object));
-            dt.Columns.Add("description", typeof(object));
+            dt.Columns.Add("наименование", typeof(object));
+            dt.Columns.Add("Описание", typeof(object));
+
+            foreach (EventItem item in dayEvents)
+            {
+                dt.Rows.Add(new string[] { item.Name, item.Description });
+            }
 
             return dt;
         }
 
+        private bool isFirstDate(List<EventItem> events, int day)
+        {
+            foreach (EventItem item in events)
+            {
+                if (item.dateTime.Day == day) return true;
+            }
+            return false;
+        }
 
     }
 }

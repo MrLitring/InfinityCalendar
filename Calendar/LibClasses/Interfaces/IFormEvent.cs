@@ -4,12 +4,15 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Calendare.LibClasses;
 
 namespace Calendare.LibClasses.Interfaces
 {
-    public interface IFormEvent
+    public interface IFormEvent : IDGV
     {
-        void DataGridViewUpdate(CustomDataTable dataTable);
+        void CMSShow(ContextMenuStrip cms);
+
+        ContextMenuStrip GetCMS();
     }
 }

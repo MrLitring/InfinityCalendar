@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Calendare.LibClasses.DataBase;
 using Calendare.Modules.EventCreate;
+using System.Drawing;
 
 namespace Calendare.Modules
 {
@@ -47,12 +48,10 @@ namespace Calendare.Modules
             mainView.ShowOtherForm(calendarView as Form, 0);
             mainView.ShowOtherForm(eventView as Form, 1);
 
-            tables = NewDataTable();
             FullLoadDataInDataGridView ();
             TextUpdate();
 
             AddLiesten();
-            CMSEvent();
 
         }
 
@@ -64,7 +63,8 @@ namespace Calendare.Modules
         {
             EventBus.OnIncreaseDate += () => IncreaseData();
             EventBus.OnDecreaseDate += () => IncreaseData(-1);
-            EventBus.OnCalendarCellRightMouseClick += (CellPoint cellPoint) => { CMSInvoke(); };
+            EventBus.OnCalendarCellRightMouseClick += (CellPoint cellPoint) => { CMSCalendareEventInvoke(); };
+            EventBus.OnEventCellRightMouseClick += (CellPoint cellPoint) => { eventModel.cellPoint = cellPoint; CMSEventEventInvoke(); };
 
             EventBus.OnEditModeChange += EditChange;
             EventBus.OnCalendarCellLeftMouseClick +=  LeftClick;
@@ -75,13 +75,17 @@ namespace Calendare.Modules
 
         private void LeftClick(CellPoint cellPoint)
         {
+            calendarModel.LastCellPoint = cellPoint;
+
+
             if (cellPoint.IsNotOutBorder(cellPoint) && tables.DateTable.Rows[cellPoint.row][cellPoint.column] != null)
             {
-                calendarView.CellFocus(cellPoint);
                 object obj = calendarModel.GetValueDataTable(cellPoint);
                 if (obj == null || string.IsNullOrEmpty(obj.ToString())) return;
                 calendarModel.DataChange((int)obj);
                 TextUpdate();
+                FullLoadDataInDataGridView();
+
             }
         }
 
@@ -94,21 +98,31 @@ namespace Calendare.Modules
 
         private void FullLoadDataInDataGridView()
         {
+            eventModel.DataChange(calendarModel.dateTime);
             tables = NewDataTable();
             CalendarDataGridViewUpdate();
             EventDataGridViewUpdate();
 
-            calendarView.CellFocus(tables.SearchValueOfTable(calendarModel.GetCurrentDate.Split(' ')[(int)calendarModel.EditMode]));
+            string[] dateParts_1 = calendarModel.GetCurrentDate.Split(' ');
+            string[] dateParts_2 = calendarModel.GetNowDate.Split(' ');
+
+            if (dateParts_1[1] == dateParts_2[1] && dateParts_1[2] == dateParts_2[2])
+            {
+                CellPoint now = CellPoint.SearchValueOfTable(dateParts_2[0], tables.DateTable);
+                calendarView.CellPaint(now, Color.Gray, Color.White);
+            }
+
+            calendarView.CellFocus(calendarModel.LastCellPoint);
         }
 
         private void CalendarDataGridViewUpdate()
         {
-            calendarView.DataGridViewUpdate(tables);
+            calendarView.KeepTable(tables);
         }
 
         private void EventDataGridViewUpdate()
         {
-            eventView.DataGridViewUpdate(tables);
+            eventView.KeepTable(tables);
         }
 
 
@@ -119,11 +133,14 @@ namespace Calendare.Modules
         }
 
         private CustomDataTable NewDataTable()
-        { 
-            DataTable dateTable = calendarModel.GetDataTable(out bool isVisibleHeader);
-            DataTable eventTable = eventModel.GetDataTable(dateTable);
+        {
+            CustomDataTable dataTable = new CustomDataTable();
+            dataTable.DateTable = calendarModel.GetDataTable(out bool isVisibleHeader);
+            dataTable.isVisibleHeader = isVisibleHeader;
+            dataTable.EventTable = eventModel.GetEventTable(dataTable.DateTable);
+            dataTable.ListEventTable = eventModel.GetDayDataTable();
 
-            return new CustomDataTable(dateTable, isVisibleHeader, eventTable);
+            return dataTable;
         }
 
         private void TextUpdate()
@@ -143,36 +160,79 @@ namespace Calendare.Modules
         {
             bool isHasEvent = false;
             ContextMenuStrip cms = calendarView.GetCMS();
-            calendarView.CMSShow(ViewHelper.ContexMenuStripExtends.CMSCheckForDesign(cms, isHasEvent));
+            calendarView.CMSShow(cms);
         }
 
-        private void CMSEvent()
+        private void CMSCalendareEventInvoke()
         {
             ContextMenuStrip cms = calendarView.GetCMS();
+            CMSEventAdd(cms);
+            calendarView.CMSShow(cms);
+        }
+
+        private void CMSEventEventInvoke()
+        {
+            ContextMenuStrip cms = eventView.GetCMS();
+            CMSEventAdd(cms);
+            eventView.CMSShow(cms);
+
+        }
 
 
+
+        private void ResetDateTime()
+        {
+            if (calendarModel.EditMode != Calendar.CalendarModel.CalendarModeType.DayMode) return;
+
+            calendarModel.ResetDate();
+            FullLoadDataInDataGridView();
+            TextUpdate();
+
+            calendarView.CellFocus(CellPoint.SearchValueOfTable(calendarModel.dateTime.Day, tables.DateTable));
+        }
+
+
+
+        private void CMSEventAdd(ContextMenuStrip cms)
+        {
             foreach (var elem in cms.Items)
             {
                 if (elem is ToolStripMenuItem)
                 {
                     ToolStripMenuItem tool = elem as ToolStripMenuItem;
 
-                    if (tool.Name == "btnAddEvent") tool.Click += ToolAdd_Click;
+                    if (tool.Name == "btnAddEvent") tool.Click += ToolCMS_Add;
+                    else if (tool.Name == "btnDeleteEvent") tool.Click += ToolCMS_Delete;
+                    else if (tool.Name == "btnReplaceEvent") tool.Click += ToolCMS_Replace;
                 }
             }
         }
 
-        private void ToolAdd_Click(object sender, EventArgs e)
+        private void ToolCMS_Replace(object sender, EventArgs e)
         {
+            CellPoint cellPoint = eventModel.cellPoint;
             EventCreateController eventCreateController = new EventCreateController(
-                EventCreateModel.Mode.Create, new EventItem(EventItem.NewEmpty(SQLEventItem.Max() + 1, calendarModel.dateTime)) );
+                EventCreateModel.Mode.Edit, eventModel.events[cellPoint.row]);
+
+
+            FullLoadDataInDataGridView();
         }
 
-        private void ResetDateTime()
+        private void ToolCMS_Delete(object sender, EventArgs e)
         {
-            calendarModel.ResetDate();
+            CellPoint cellPoint = eventModel.cellPoint;
+            SQLEventItem item = new SQLEventItem(eventModel.dayEvents[cellPoint.row], SQLEventItem.DataOperation.Delete);
+            item.Execute();
+
             FullLoadDataInDataGridView();
-            TextUpdate();
+        }
+
+        private void ToolCMS_Add(object sender, EventArgs e)
+        {
+            EventCreateController eventCreateController = new EventCreateController(
+                EventCreateModel.Mode.Create, new EventItem(EventItem.NewEmpty(SQLEventItem.Max() + 1, calendarModel.dateTime)));
+
+            FullLoadDataInDataGridView();
         }
 
     }

@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Calendare.LibClasses.ViewHelper;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 
 namespace Calendare.Modules.Calendar
 {
@@ -34,10 +35,11 @@ namespace Calendare.Modules.Calendar
             InitEvent();
         }
 
-        void IFormCalendare.DataGridViewUpdate(LibClasses.CustomDataTable dataTable)
+        void IDGV.KeepTable(LibClasses.CustomDataTable dataTable)
         {
             isHeaderView = dataTable.isVisibleHeader;
             DGVUpdateData(dataTable);
+            DGVEventUpdate(dataTable.EventTable);
             RowResize();
 
         }
@@ -49,6 +51,12 @@ namespace Calendare.Modules.Calendar
         ContextMenuStrip IFormCalendare.GetCMS() { return contextMenuStrip1; }
 
         void IFormCalendare.CMSShow(ContextMenuStrip cms) { cms.Show(Cursor.Position); }
+
+        void IFormCalendare.CellPaint(Calendare.LibClasses.CellPoint cellPoint, System.Drawing.Color backColor, System.Drawing.Color foreColor)
+        {
+            dataGridView1.Rows[cellPoint.row].Cells[cellPoint.column].Style.BackColor = backColor;
+            dataGridView1.Rows[cellPoint.row].Cells[cellPoint.column].Style.ForeColor = foreColor;
+        }
 
         private void InitEvent()
         {
@@ -67,13 +75,27 @@ namespace Calendare.Modules.Calendar
         {
             dataGridView1.Reset();
 
-            dataGridView1.DataSource = dataTable.DateTable;
-            dataGridView1.ColumnHeadersVisible = dataTable.isVisibleHeader;
-            dataGridView1.RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            //dataGridView1.DataSource = dataTable.DateTable;
 
-            foreach (DataGridViewColumn column in dataGridView1.Columns)
+            dataGridView1.DataTableSource(dataTable.DateTable);
+            dataGridView1.GenerallDesign(Config.Settings.BackGroundColor, Config.Settings.ForeColor);
+
+            dataGridView1.ColumnHeadersVisible = dataTable.isVisibleHeader;
+
+        }
+
+        private void DGVEventUpdate(DataTable dataTable)
+        {
+            DataGridView dgv = dataGridView1;
+
+            for (int row = 0; row < dataTable.Rows.Count; row++)
             {
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                for (int col = 0; col < dataTable.Columns.Count; col++)
+                {
+                    if (int.Parse(dataTable.Rows[row][col].ToString()) == 1)
+                        dgv.Rows[row].Cells[col].Style.ForeColor = Config.Settings.ExistEvent;
+                    
+                }
             }
 
         }

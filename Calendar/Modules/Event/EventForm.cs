@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Calendare.LibClasses;
+using Calendare.LibClasses.ViewHelper;
 
 namespace Calendare.Modules.Event
 {
@@ -19,16 +20,43 @@ namespace Calendare.Modules.Event
             InitializeComponent();
         }
 
-        void IFormEvent.DataGridViewUpdate(CustomDataTable tables) => DGVDataUpdate(tables);
+        void IDGV.KeepTable(CustomDataTable tables) => DGVDataUpdate(tables);
 
         private void DGVDataUpdate(CustomDataTable tables)
         {
-            this.dataGridView1.DataSource = tables.CopyTextTable;
+            dataGridView1.DataTableSource(tables.ListEventTable);
+            dataGridView1.GenerallDesign(Config.Settings.BackGroundColor, Config.Settings.ForeColor);
+
+            dataGridView1.Columns[0].Width = dataGridView1.ClientSize.Width / 2;
         }
 
         private void EventForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        void IFormEvent.CMSShow(ContextMenuStrip cms) { cms.Show(Cursor.Position); }
+
+        ContextMenuStrip IFormEvent.GetCMS() { return contextMenuStrip1; }
+
+
+        private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            CellPoint cellPoint = new CellPoint(e.RowIndex, e.ColumnIndex);
+            //if (cellPoint.row < 0 || cellPoint.column < 0) return;
+
+
+            if (e.Button == MouseButtons.Left)
+            {
+                dataGridView1.CellFocus(cellPoint);
+                EventBus.OnEventCellLeftMouseClick?.Invoke(cellPoint);
+            }
+
+            if (e.Button == MouseButtons.Right)
+            {
+                EventBus.OnEventCellRightMouseClick?.Invoke(cellPoint);
+
+            }
         }
     }
 }

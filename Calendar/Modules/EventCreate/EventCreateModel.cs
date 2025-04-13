@@ -32,7 +32,6 @@ namespace Calendare.Modules.EventCreate
             {
                 case Mode.Create: Create(); break;
                 case Mode.Edit: Update(); break;
-                case Mode.Delete:Delete(); break;
             }
         }
 
@@ -45,12 +44,6 @@ namespace Calendare.Modules.EventCreate
         public void Update()
         {
             SQLEventItem sql = new SQLEventItem(item, SQLEventItem.DataOperation.Update);
-            sql.Execute();
-        }
-
-        public void Delete()
-        {
-            SQLEventItem sql = new SQLEventItem(item, SQLEventItem.DataOperation.Delete);
             sql.Execute();
         }
 

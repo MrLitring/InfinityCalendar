@@ -65,11 +65,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\ColorSettings.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="EventBus.cs" />
     <Compile Include="LibClasses\CellPoint.cs" />
     <Compile Include="LibClasses\CS_Math.cs" />
-    <Compile Include="LibClasses\CustomDataTable.cs" />
+    <Compile Include="LibClasses\CustomDataTable\CustomDataTable.cs" />
     <Compile Include="LibClasses\CustomDateTime\CustomDateTime.cs" />
     <Compile Include="LibClasses\CustomDateTime\CustomDateTime.Static.cs" />
     <Compile Include="LibClasses\CustomDateTime\CustomDateTime.Table.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="LibClasses\DataBase\XmlReader.cs" />
     <Compile Include="LibClasses\DataBase\XmlWriter.cs" />
     <Compile Include="LibClasses\EventItem.cs" />
+    <Compile Include="LibClasses\Interfaces\IDGV.cs" />
     <Compile Include="LibClasses\Interfaces\IFormCalendare.cs" />
     <Compile Include="LibClasses\Interfaces\IFormEvent.cs" />
     <Compile Include="LibClasses\Interfaces\IFormShower.cs" />
@@ -107,12 +109,14 @@
       <DependentUpon>EventForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Modules\Event\EventModel.cs" />
+    <Compile Include="Modules\Main\Controller.cs" />
     <Compile Include="Modules\Main\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Modules\Main\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Main\MainFormModel.cs" />
     <Compile Include="Modules\Messages\WindowsAlert.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

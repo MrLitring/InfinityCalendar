@@ -132,14 +132,5 @@ namespace Calendare.LibClasses.CustomDateTime
             }
         }
 
-        private int OffsetCalculation()
-        {
-            string nameStart = GetDayOfWeekName(1, Month, Year);
-
-            for (int i = 0; i < WeekFullNames.Length; i++)
-                if (nameStart == WeekFullNames[i]) return i;
-
-            return 0;
-        }
     }
 }

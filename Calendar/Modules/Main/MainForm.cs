@@ -21,6 +21,7 @@ namespace Calendare.Modules.Main
                 splitContainer1.Panel1,
                 splitContainer1.Panel2
             };
+
         }
 
         void IFormShower.ShowOtherForm(Form form, int index)

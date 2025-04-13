@@ -84,22 +84,22 @@
             // 
             this.button1.FlatAppearance.BorderSize = 0;
             this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.Location = new System.Drawing.Point(64, 321);
+            this.button1.Location = new System.Drawing.Point(64, 275);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(202, 28);
             this.button1.TabIndex = 6;
-            this.button1.Text = "button1";
+            this.button1.Text = "Отмена";
             this.button1.UseVisualStyleBackColor = true;
             // 
             // button2
             // 
             this.button2.FlatAppearance.BorderSize = 0;
             this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Location = new System.Drawing.Point(64, 287);
+            this.button2.Location = new System.Drawing.Point(64, 241);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(202, 28);
             this.button2.TabIndex = 7;
-            this.button2.Text = "button2";
+            this.button2.Text = "Сохранить";
             this.button2.UseVisualStyleBackColor = true;
             // 
             // checkBox1
@@ -107,9 +107,9 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(12, 187);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(80, 17);
+            this.checkBox1.Size = new System.Drawing.Size(171, 17);
             this.checkBox1.TabIndex = 9;
-            this.checkBox1.Text = "checkBox1";
+            this.checkBox1.Text = "Уведомлять о наступлении?";
             this.checkBox1.UseVisualStyleBackColor = true;
             // 
             // EventCreateForm
@@ -127,6 +127,7 @@
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "EventCreateForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "EventCreateForm";
             this.ResumeLayout(false);
             this.PerformLayout();

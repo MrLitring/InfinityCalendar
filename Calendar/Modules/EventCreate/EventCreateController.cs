@@ -52,6 +52,8 @@ namespace Calendare.Modules.EventCreate
             ReadData();
             model.item = item;
             model.Execute();
+
+            this.form.Close();
         }
 
 

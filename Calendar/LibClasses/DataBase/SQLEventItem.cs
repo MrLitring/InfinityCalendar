@@ -130,7 +130,7 @@ namespace Calendare.LibClasses.DataBase
             List<EventItem> eventItems = new List<EventItem>();
 
             string query = $"SELECT * FROM {Config.Settings.DataBaseEventTableName}";
-            query += string.IsNullOrEmpty(where) == true ? " ;" : " " + where + ";";
+            query += string.IsNullOrEmpty(where) == true ? " ;" : " where " + where + ";";
             SQLiteCommand command = new SQLiteCommand();
             command.CommandText = query;
 
