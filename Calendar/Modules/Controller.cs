@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using Calendare.LibClasses.DataBase;
 using Calendare.Modules.EventCreate;
 using System.Drawing;
+using System.Text;
 
 namespace Calendare.Modules
 {
@@ -27,6 +28,11 @@ namespace Calendare.Modules
 
         private CustomDataTable tables;
 
+        ContextMenuStrip calendae_cms = null;
+        ContextMenuStrip event_cms = null;
+
+
+
 
         public Controller(IEnumerable<object> args)
         {
@@ -41,18 +47,33 @@ namespace Calendare.Modules
 
         public void Main()
         {
-            if (IsCanWork() == false) throw new Exception("Отсутвует возможность работать корректно");
+            try
+            {
+                if (IsCanWork() == false) throw new Exception("Отсутвует возможность работать корректно");
 
-            eventModel.dateTime = calendarModel.dateTime;
+                eventModel.dateTime = calendarModel.dateTime;
 
-            mainView.ShowOtherForm(calendarView as Form, 0);
-            mainView.ShowOtherForm(eventView as Form, 1);
+                mainView.ShowOtherForm(calendarView as Form, 0);
+                mainView.ShowOtherForm(eventView as Form, 1);
 
-            FullLoadDataInDataGridView ();
-            TextUpdate();
+                FullLoadDataInDataGridView();
+                TextUpdate();
 
-            AddLiesten();
+                AddLiesten();
+                EventInvoke();
+                calendarModel.LastCellPoint = CellPoint.SearchValueOfTable(calendarModel.dateTime.Day, tables.DateTable);
+                calendarView.CellFocus(calendarModel.LastCellPoint);
 
+                calendae_cms = calendarView.GetCMS();
+                event_cms = eventView.GetCMS();
+
+                CMSEventAdd(calendae_cms);
+                CMSEventAdd(event_cms);
+            }
+            catch (Exception ex)
+            {
+                Notifity.Invoke("Main - \n" + ex.Message.ToString(), Properties.Resources.imageres_98);
+            }
         }
 
         public Form GetMainViewForm { get { return (mainView as Form); } }
@@ -63,15 +84,20 @@ namespace Calendare.Modules
         {
             EventBus.OnIncreaseDate += () => IncreaseData();
             EventBus.OnDecreaseDate += () => IncreaseData(-1);
-            EventBus.OnCalendarCellRightMouseClick += (CellPoint cellPoint) => { CMSCalendareEventInvoke(); };
-            EventBus.OnEventCellRightMouseClick += (CellPoint cellPoint) => { eventModel.cellPoint = cellPoint; CMSEventEventInvoke(); };
+            EventBus.OnCalendarCellRightMouseClick += (CellPoint cellPoint) => { calendarView.CMSShow(calendae_cms); };
+            EventBus.OnEventCellRightMouseClick += (CellPoint cellPoint) => { eventModel.cellPoint = cellPoint; eventView.CMSShow(event_cms); };
 
             EventBus.OnEditModeChange += EditChange;
-            EventBus.OnCalendarCellLeftMouseClick +=  LeftClick;
+            EventBus.OnCalendarCellLeftMouseClick += LeftClick;
 
             EventBus.OnRestartDate += ResetDateTime;
+            EventBus.OnSimulateDate += EventInvoke;
         }
 
+        private void EventInvoke()
+        {
+            Notifity.Invoke(eventModel.dayEvents.Count > 0? Notifity.EventContent(eventModel.dayEvents) : "На сегодня нету никаких событий");
+        }
 
         private void LeftClick(CellPoint cellPoint)
         {
@@ -100,29 +126,23 @@ namespace Calendare.Modules
         {
             eventModel.DataChange(calendarModel.dateTime);
             tables = NewDataTable();
-            CalendarDataGridViewUpdate();
-            EventDataGridViewUpdate();
+            calendarView.KeepTable(tables);
+            eventView.KeepTable(tables);
+
 
             string[] dateParts_1 = calendarModel.GetCurrentDate.Split(' ');
             string[] dateParts_2 = calendarModel.GetNowDate.Split(' ');
 
-            if (dateParts_1[1] == dateParts_2[1] && dateParts_1[2] == dateParts_2[2])
+            if (calendarModel.EditMode == Calendar.CalendarModel.CalendarModeType.DayMode)
             {
-                CellPoint now = CellPoint.SearchValueOfTable(dateParts_2[0], tables.DateTable);
-                calendarView.CellPaint(now, Color.Gray, Color.White);
+                if (dateParts_1[1] == dateParts_2[1] && dateParts_1[2] == dateParts_2[2])
+                {
+                    CellPoint now = CellPoint.SearchValueOfTable(dateParts_2[0], tables.DateTable);
+                    calendarView.CellPaint(now, Config.Settings.Today, Color.White);
+                }
             }
 
             calendarView.CellFocus(calendarModel.LastCellPoint);
-        }
-
-        private void CalendarDataGridViewUpdate()
-        {
-            calendarView.KeepTable(tables);
-        }
-
-        private void EventDataGridViewUpdate()
-        {
-            eventView.KeepTable(tables);
         }
 
 
@@ -154,28 +174,6 @@ namespace Calendare.Modules
             calendarModel.IncreaseDate(value);
             FullLoadDataInDataGridView();
             TextUpdate();
-        }
-
-        private void CMSInvoke()
-        {
-            bool isHasEvent = false;
-            ContextMenuStrip cms = calendarView.GetCMS();
-            calendarView.CMSShow(cms);
-        }
-
-        private void CMSCalendareEventInvoke()
-        {
-            ContextMenuStrip cms = calendarView.GetCMS();
-            CMSEventAdd(cms);
-            calendarView.CMSShow(cms);
-        }
-
-        private void CMSEventEventInvoke()
-        {
-            ContextMenuStrip cms = eventView.GetCMS();
-            CMSEventAdd(cms);
-            eventView.CMSShow(cms);
-
         }
 
 
@@ -221,8 +219,15 @@ namespace Calendare.Modules
         private void ToolCMS_Delete(object sender, EventArgs e)
         {
             CellPoint cellPoint = eventModel.cellPoint;
-            SQLEventItem item = new SQLEventItem(eventModel.dayEvents[cellPoint.row], SQLEventItem.DataOperation.Delete);
-            item.Execute();
+            SQLEventItem item = null;
+            if (cellPoint.IsNotOutBorder(cellPoint))
+            {
+                if (cellPoint.row <= eventModel.dayEvents.Count)
+                {
+                    item = new SQLEventItem(eventModel.dayEvents[cellPoint.row], SQLEventItem.DataOperation.Delete);
+                    item.Execute();
+                }
+            }
 
             FullLoadDataInDataGridView();
         }

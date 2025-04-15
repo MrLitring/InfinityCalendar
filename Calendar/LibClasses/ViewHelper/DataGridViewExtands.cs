@@ -42,9 +42,12 @@ namespace Calendare.LibClasses.ViewHelper
                 dgv.CurrentCell = (cellPoint != null) ? dgv.Rows[cellPoint.row].Cells[cellPoint.column] : dgv.Rows[0].Cells[0]; 
         }
 
-        public static void DataTableSource(this DataGridView dgv, DataTable dataTable)
+        public static void DataTableSource(this DataGridView dgv, DataTable dataTable, int offset = 0)
         {
             dgv.Reset();
+            int lasCol = dgv.Columns.Count + offset;
+            for (int col = 0; col < offset; col++)
+                dgv.Columns.Add("adaptive_" + offset, string.Empty);
 
             for (int col = 0; col < dataTable.Columns.Count; col++)
             {
@@ -59,9 +62,9 @@ namespace Calendare.LibClasses.ViewHelper
             {
                 dgv.Rows.Add();
 
-                for (int col = 0; col < dataTable.Columns.Count; col++)
+                for (int col = lasCol; col < dataTable.Columns.Count + lasCol; col++)
                 {
-                    dgv.Rows[row].Cells[col].Value = dataTable.Rows[row][col];
+                    dgv.Rows[row].Cells[col].Value = dataTable.Rows[row][col - lasCol];
                 }
                 row++;
             } while (row < dataTable.Rows.Count);
@@ -84,6 +87,7 @@ namespace Calendare.LibClasses.ViewHelper
                 foreach(DataGridViewCell cell in row.Cells)
                 {
                     cell.Style.BackColor = backColor;
+                    cell.Style.SelectionBackColor = Config.Settings.BackGroundColorHoover;
                     cell.Style.ForeColor = foreColor;
 
                     //cell.Style.Font = new Font(cell.Style.Font.OriginalFontName, cell.Style.Font.Size + 4,FontStyle.Bold);

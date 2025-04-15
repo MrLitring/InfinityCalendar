@@ -34,6 +34,8 @@
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.btnReplaceEvent = new System.Windows.Forms.ToolStripMenuItem();
             this.btnDeleteEvent = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.RestartRow = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -64,14 +66,17 @@
             this.dataGridView1.Size = new System.Drawing.Size(800, 450);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_CellMouseClick);
+            this.dataGridView1.SelectionChanged += new System.EventHandler(this.dataGridView1_SelectionChanged);
             // 
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.RestartRow,
+            this.toolStripSeparator1,
             this.btnReplaceEvent,
             this.btnDeleteEvent});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 70);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 98);
             // 
             // btnReplaceEvent
             // 
@@ -84,6 +89,18 @@
             this.btnDeleteEvent.Name = "btnDeleteEvent";
             this.btnDeleteEvent.Size = new System.Drawing.Size(180, 22);
             this.btnDeleteEvent.Text = "Удалить событие";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            // 
+            // RestartRow
+            // 
+            this.RestartRow.Name = "RestartRow";
+            this.RestartRow.Size = new System.Drawing.Size(180, 22);
+            this.RestartRow.Text = "Сбросить размеры";
+            this.RestartRow.Click += new System.EventHandler(this.RestartRow_Click);
             // 
             // EventForm
             // 
@@ -107,5 +124,7 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
         private System.Windows.Forms.ToolStripMenuItem btnReplaceEvent;
         private System.Windows.Forms.ToolStripMenuItem btnDeleteEvent;
+        private System.Windows.Forms.ToolStripMenuItem RestartRow;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }

@@ -57,12 +57,13 @@ namespace Calendare.Modules.Event
         {
             DataTable dt = new DataTable();
 
-            dt.Columns.Add("наименование", typeof(object));
+            dt.Columns.Add("Название", typeof(object));
             dt.Columns.Add("Описание", typeof(object));
+            dt.Columns.Add("Сообщать", typeof(object));
 
             foreach (EventItem item in dayEvents)
             {
-                dt.Rows.Add(new string[] { item.Name, item.Description });
+                dt.Rows.Add(new string[] { item.Name, item.Description, item.IsAllert? "Да" : "Нет" });
             }
 
             return dt;

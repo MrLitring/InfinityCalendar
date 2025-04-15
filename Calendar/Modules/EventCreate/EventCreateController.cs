@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Calendare.Modules.EventCreate
 {
@@ -39,9 +40,9 @@ namespace Calendare.Modules.EventCreate
         {
             EventItem newItem = new EventItem(
                 item.Id,
-                form.textBox2.Text,
+                form.textBox1.Text,
                 item.dateTime,
-                form.textBox3.Text,
+                form.textBox2.Text,
                 form.checkBox1.Checked
                 );
             item = newItem;
@@ -59,7 +60,7 @@ namespace Calendare.Modules.EventCreate
 
         private void Cancel()
         {
-            this.form.Close();
+            (this.form as Form).Close();
         }
 
     }

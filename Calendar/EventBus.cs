@@ -31,6 +31,10 @@ namespace Calendare
 
         public static Action OnDBExport;
         public static Action OnDBImport;
-        
+
+        public static Action OnExit;
+
+        public static Action OnSimulateDate;
+
     }
 }

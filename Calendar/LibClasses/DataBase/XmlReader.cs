@@ -23,8 +23,7 @@ namespace Calendare.LibClasses.DataBase
             xmlDoc = new System.Xml.XmlDocument();
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
-            sb.Append("\\" + FilePath);
+            sb.Append(FilePath);
 
             if (!FilePath.EndsWith(".xml"))
                 sb.Append(".xml");
@@ -37,17 +36,16 @@ namespace Calendare.LibClasses.DataBase
             List<EventItem> events = new List<EventItem>();
 
             if(!ExistXmlDoc(FilePath)) return events;
-            
             xmlDoc.Load(FilePath);
             XmlNodeList eventNodes = xmlDoc.SelectNodes("/EventItems/EventItem");
 
             foreach (XmlNode eventNode in eventNodes)
             {
-                int id = Convert.ToInt32(eventNode["id"].InnerText);
-                string name = eventNode["name"].InnerText;
-                string description = eventNode["description"].InnerText;
-                string date = eventNode["date"].InnerText;
-                bool isAllert = (int.Parse(eventNode["isAllert"].InnerText) == 1) ? true : false;
+                int id = Convert.ToInt32(eventNode["Id"].InnerText);
+                string name = eventNode["Name"].InnerText;
+                string description = eventNode["Description"].InnerText;
+                string date = eventNode["DateTime"].InnerText;
+                bool isAllert = (int.Parse(eventNode["IsAllert"].InnerText) == 1) ? true : false;
 
                 EventItem item = new EventItem(id, name, new CustomDateTime.CustomDateTime(date, '.'), description, isAllert );
 
