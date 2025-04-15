@@ -12,6 +12,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Calendare.LibClasses.ViewHelper;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
+using Windows.UI.Xaml.Documents;
 
 namespace Calendare.Modules.Calendar
 {
@@ -19,6 +21,7 @@ namespace Calendare.Modules.Calendar
     {
         private bool isHeaderView = false;
         private Label[] labels;
+        private Font fontBold;
 
 
         public CalendarForm()
@@ -32,12 +35,17 @@ namespace Calendare.Modules.Calendar
             };
 
             InitEvent();
+            fontBold = NewFont(dataGridView1.Font);
+
+            label1.Hoover(Config.Settings.ColorHoover, Config.Settings.ForeColor);
+            label2.Hoover(Config.Settings.ColorHoover, Config.Settings.ForeColor);
         }
 
-        void IFormCalendare.DataGridViewUpdate(LibClasses.CustomDataTable dataTable)
+        void IDGV.KeepTable(LibClasses.CustomDataTable dataTable)
         {
             isHeaderView = dataTable.isVisibleHeader;
             DGVUpdateData(dataTable);
+            DGVEventUpdate(dataTable.EventTable);
             RowResize();
 
         }
@@ -49,6 +57,11 @@ namespace Calendare.Modules.Calendar
         ContextMenuStrip IFormCalendare.GetCMS() { return contextMenuStrip1; }
 
         void IFormCalendare.CMSShow(ContextMenuStrip cms) { cms.Show(Cursor.Position); }
+
+        void IFormCalendare.CellPaint(Calendare.LibClasses.CellPoint cellPoint, System.Drawing.Color backColor, System.Drawing.Color foreColor)
+        {
+            dataGridView1.Rows[cellPoint.row].Cells[cellPoint.column].Style.BackColor = backColor;
+        }
 
         private void InitEvent()
         {
@@ -67,13 +80,28 @@ namespace Calendare.Modules.Calendar
         {
             dataGridView1.Reset();
 
-            dataGridView1.DataSource = dataTable.DateTable;
-            dataGridView1.ColumnHeadersVisible = dataTable.isVisibleHeader;
-            dataGridView1.RowHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridView1.DataTableSource(dataTable.DateTable);
+            dataGridView1.GenerallDesign(Config.Settings.BackGroundColor, Config.Settings.ForeColor);
 
-            foreach (DataGridViewColumn column in dataGridView1.Columns)
+            dataGridView1.ColumnHeadersVisible = dataTable.isVisibleHeader;
+
+        }
+
+        private void DGVEventUpdate(DataTable dataTable)
+        {
+            DataGridView dgv = dataGridView1;
+
+            for (int row = 0; row < dataTable.Rows.Count; row++)
             {
-                column.SortMode = DataGridViewColumnSortMode.NotSortable;
+                for (int col = 0; col < dataTable.Columns.Count; col++)
+                {
+                    if (int.Parse(dataTable.Rows[row][col].ToString()) == 1)
+                    {
+                        DataGridViewCell cell = dgv.Rows[row].Cells[col];
+                        cell.Style.ForeColor = Config.Settings.ExistEvent;
+                        cell.Style.Font = fontBold;
+                    }
+                }
             }
 
         }
@@ -81,8 +109,6 @@ namespace Calendare.Modules.Calendar
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             CellPoint cellPoint = new CellPoint(e.RowIndex, e.ColumnIndex);
-            //if (cellPoint.row < 0 || cellPoint.column < 0) return;
-
 
             if(e.Button == MouseButtons.Left)
             {
@@ -100,6 +126,17 @@ namespace Calendare.Modules.Calendar
         private void RowResize() { this.dataGridView1.RowResize(isHeaderView); }
 
         private void LBLTextUpdate(int index, string str) { labels[index].Text = str; }
+
+        private Font NewFont(Font font)
+        {
+            Font newFont = new Font(
+                font.FontFamily,
+                font.Size,
+                FontStyle.Bold
+                );
+            return newFont;
+        }
+
 
     }
 }

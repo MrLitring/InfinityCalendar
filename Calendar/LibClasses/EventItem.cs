@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Calendare.LibClasses.DataBase;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,6 +35,11 @@ namespace Calendare.LibClasses
             this.IsAllert = item.IsAllert;
         }
 
+        
+        public void NewID()
+        {
+            this.Id = SQLEventItem.Max() + 1;
+        }
 
         public enum ArrayToElement
         {

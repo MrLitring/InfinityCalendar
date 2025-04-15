@@ -113,7 +113,7 @@ namespace Calendare.LibClasses.DataBase
             sb.Append("\"Description\" TEXT, ");
             sb.Append("\"Day\" INTEGER, ");
             sb.Append("\"Month\" INTEGER, ");
-            sb.Append("\"Year\" , INTEGER");
+            sb.Append("\"Year\" INTEGER,");
             sb.Append("\"IsAllert\" INTEGER");
             sb.Append(");");
 

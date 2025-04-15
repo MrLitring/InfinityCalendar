@@ -18,7 +18,10 @@ namespace Calendare
         public static Action<CellPoint> OnCalendarCellLeftMouseClick;
         public static Action<CellPoint> OnCalendarCellRightMouseClick;
 
-        public static Action<CellPoint> OnEventMourseClick;
+        public static Action<CellPoint> OnEventMouseClick;
+
+        public static Action<CellPoint> OnEventCellLeftMouseClick;
+        public static Action<CellPoint> OnEventCellRightMouseClick;
 
         public static Action OnNewEvent;
         public static Action OnEditEvent;
@@ -28,6 +31,10 @@ namespace Calendare
 
         public static Action OnDBExport;
         public static Action OnDBImport;
-        
+
+        public static Action OnExit;
+
+        public static Action OnSimulateDate;
+
     }
 }

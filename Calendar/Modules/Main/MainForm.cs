@@ -9,7 +9,6 @@ namespace Calendare.Modules.Main
     public partial class MainForm : Form, IFormShower
     {
         private Control[] controlShowers;
-        private string path = "\\InfinityCalendar\\calendar.xml";
 
 
         public MainForm()
@@ -21,6 +20,8 @@ namespace Calendare.Modules.Main
                 splitContainer1.Panel1,
                 splitContainer1.Panel2
             };
+
+            new Calendare.LibClasses.WindowsDragController(toolStrip1);
         }
 
         void IFormShower.ShowOtherForm(Form form, int index)
@@ -32,20 +33,24 @@ namespace Calendare.Modules.Main
             FormViewHelper.ShowFormInPanel(controlShowers[index], form);
         }
 
-        private void btnDBExport_Click(object sender, EventArgs e)
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            EventBus.OnExit?.Invoke();
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
         {
             EventBus.OnDBExport?.Invoke();
         }
 
-        private void btnDBImport_Click(object sender, EventArgs e)
+        private void toolStripButton3_Click(object sender, EventArgs e)
         {
             EventBus.OnDBImport?.Invoke();
         }
 
-        private void splitContainer1_Panel1_SizeChanged(object sender, EventArgs e)
+        private void toolStripButton4_Click(object sender, EventArgs e)
         {
-        //    if(splitContainer1.Panel1.Height <= splitContainer1.Panel1MinSize) splitContainer1.Panel1Collapsed = true;
-        //    else splitContainer1.Panel1Collapsed = false;
+            EventBus.OnSimulateDate?.Invoke();
         }
     }
 }

@@ -6,7 +6,7 @@ using Calendare.LibClasses.CustomDateTime;
 
 namespace Calendare.Config
 {
-    public static class Settings
+    public static partial class Settings
     {
         public const string DataBaseEventTableName = "TableOfEvents";
 
@@ -17,10 +17,7 @@ namespace Calendare.Config
         private const string DataBaseName = "db";
 
         private const string DataBaseImport = "InfinityCalendareEvents";
-
-
-        public static Color ExistEvent = Color.Green;
-        public static Color Today = Color.LightBlue;
+               
 
         
         public static void Initilization()

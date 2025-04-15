@@ -29,11 +29,11 @@ namespace Calendare.LibClasses.ViewHelper
                 foreach (ToolStripMenuItem item in contextMenuStrip.Items)
                 {
                     item.Enabled = true;
+                    if ((item as ToolStripMenuItem).Name == "btnAddEvent") (item as ToolStripMenuItem).Enabled = false;
                 }
             }
 
             return contextMenuStrip;
         }
-
     }
 }

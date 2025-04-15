@@ -19,6 +19,7 @@ namespace Calendare.Modules.Calendar
             MonthMode = 1,
             YearMode = 2
         }
+        public CellPoint LastCellPoint = new CellPoint(0, 0);
         public CalendarModeType EditMode { get; private set; }
 
         public string GetCurrentDate { get { return dateTime.ToString("d.mm.y", ' '); } }
